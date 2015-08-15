@@ -326,6 +326,10 @@ a:hover, a:active, a:focus {
 				inputNumbers.checked = presets[valueTag].numbers;
 			}
 
+			if (valueTag == '' || valueMaster == '') {
+				return; /* Wait for both fields to have data */
+			}
+
 			inputResult.value = PassHashCommon.generateHashWord(
 					valueTag,
 					valueMaster,
