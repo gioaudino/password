@@ -1,19 +1,126 @@
 <!DOCTYPE HTML>
+<html>
+<head>
 <title>Password Hasher</title>
 <meta charset='utf-8'>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link href='http://fonts.googleapis.com/css?family=Roboto:100' rel='stylesheet' type='text/css' />
 <style>
+
+*, *:before, *:after {
+	box-sizing: border-box;
+}
+
+html{
+	height: 100%;
+	background: linear-gradient(to bottom, rgba(0,0,0,0.33) 0%,rgba(0,0,0,0) 100%); /* W3C */
+}
 body {
+	min-height: 100%;
+	padding: 0;
+	margin: 0;
 	font-family: sans-serif;
 	display: flex;
-	flex-flow: column;
 	align-items: center;
+	justify-content: center;
+	font-family: 'Roboto', sans-serif;
 }
-
-#hash-word {
+.wrap {
+	max-width: 976px;
+	width: 100%;
+	padding: 16px;
+	display: flex;
+	margin-left: -32px;
+	margin-top: -32px;
+	flex-wrap: wrap;
+}
+.input-label {
+	font-size: 2rem;
+	display: block;
+	margin: 0 0 8px;
+}
+.major-input {
+	font-size: 2rem;
+	padding: 8px 16px;
+	width: 100%;
+	border: solid 1px #ccc;
+	border-top-color: #777;
+	border-left-color: #777;
+	border-radius: 4px;
 	font-family: monospace;
+	outline: none;
+	transition: box-shadow 0.3s, border 0.3s;
+}
+.major-input:focus {
+	box-shadow: 0 0 5px 1px #969696;
+}
+.tag, .master, .result, .advanced {
+	width: 100%;
+	padding: 32px 0 0 32px;
+}
+.result-input {
+	flex-grow: 1;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+.result-copy {
+	width: auto;
+	padding: 16px;
+	height: 100%;
+	background: #999;
+	color: #fff;
+	border: solid 1px #777;
+	border-top-right-radius: 4px;
+	border-bottom-right-radius: 4px;
+	text-transform: uppercase;
+	outline: none;
+
+}
+.advanced-button {
+	padding: 8px 16px;
+	background: #999;
+	color: #fff;
+	border: solid 1px #777;
+	text-transform: uppercase;
+	border-radius: 4px;
+	outline: none;
+}
+.advanced-button:after {
+	content: " ";
+	display: inline-block;
+	margin-left: 8px;
+	border-left: solid 4px transparent;
+	border-right: solid 4px transparent;
+	border-top: solid 4px #fff;
+	position: relative;
+	top: -3px;
 }
 
+.advanced-button:active,
+.result-copy:active {
+	background: #777;
+}
+
+.result-field {
+	display: flex;
+}
+
+@media (min-width: 768px) {
+	.input-label {
+		font-size: 2.8rem;
+	}
+	.tag {
+		width: 40%;
+	}
+	.master {
+		width: 60%
+	}
+	.result-label {
+		display: none;
+	}
+}
+
+/*
 fieldset {
 	border: none;
 	background: #eee;
@@ -47,8 +154,40 @@ fieldset.size > ul {
 	-moz-columns: 2;
 	columns: 2;
 }
+*/
 </style>
+</head>
+<body>
 
+<div class="wrap">
+	<div class="tag">
+		<label class="input-label">Tag</label>
+		<input class="major-input" type="text" />
+	</div>
+
+	<div class="master">
+		<label class="input-label">Master password</label>
+		<input class="major-input" type="password" />
+	</div>
+
+	<div class="result">
+		<label class="result-label input-label">Result</label>
+		<div class="result-field">
+			<input class="result-input major-input" type="text" />
+			<button class="result-copy">Copy</button>
+		</div>
+	</div>
+
+	<div class="advanced">
+		<button class="advanced-button">Advanced</button>
+		<div class="advanced-reveal">
+
+		</div>
+	</div>
+
+</div>
+
+<!--
 <form>
 	<fieldset>
 		<legend>Site Tag</legend>
@@ -104,7 +243,7 @@ fieldset.size > ul {
 		</fieldset>
 	</details>
 </form>
-
+-->
 <script>
 function findAll(sel) { return [].slice.call(document.querySelectorAll(sel)); }
 function find(sel) { return document.querySelector(sel); }
@@ -566,3 +705,5 @@ var PassHashCommon =
 
 }
 </script>
+</body>
+</html>
