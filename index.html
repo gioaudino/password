@@ -13,19 +13,25 @@
 
 html{
 	height: 100%;
-	background: linear-gradient(to bottom, rgba(0,0,0,0.33) 0%,rgba(0,0,0,0) 100%); /* W3C */
-	background-attachment: fixed;
+	background: linear-gradient(to bottom, rgba(0,0,0,0.33) 0%,rgba(0,0,0,0) 100%) fixed; /* W3C */
 }
 body {
 	min-height: 100%;
 	padding: 0;
 	margin: 0;
-	font-family: sans-serif;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	font-family: 'Roboto', sans-serif;
 }
+
+a {
+	color: #777;
+}
+a:hover, a:active, a:focus {
+	color: #333;
+}
+
 .wrap {
 	max-width: 976px;
 	width: 100%;
@@ -108,6 +114,12 @@ body {
 	border-top: none;
 }
 
+.advanced-button:hover,
+.result-copy:hover  {
+	cursor: pointer;
+	background: #888;
+}
+
 .advanced-button:active,
 .result-copy:active {
 	background: #777;
@@ -135,10 +147,9 @@ body {
 .ad-line label {
 	flex-grow: 1;
 }
-.length-input {
+.length-input, .tag-id-input {
 	font-size: 1.4rem;
 	padding: 4px 8px;
-	width: 70px;
 	border: solid 1px #ccc;
 	border-top-color: #777;
 	border-left-color: #777;
@@ -147,13 +158,25 @@ body {
 	outline: none;
 	transition: box-shadow 0.3s, border 0.3s;
 }
-.length-input:focus {
+.length-input {
+	width: 70px;
+}
+.length-input:focus,
+.tag-id-input:focus {
 	box-shadow: 0 0 5px 1px #969696;
 }
 .input-checkbox {
 	width: 22px;
 	height: 22px;
 }
+.info {
+	border-top: solid 1px #ccc;
+	border-bottom: solid 1px #ccc;
+	padding: 16px 0;
+	font-size: 1rem;
+	text-align: center;
+}
+
 @media (min-width: 768px) {
 	.input-label {
 		font-size: 2.8rem;
@@ -168,44 +191,6 @@ body {
 		display: none;
 	}
 }
-
-
-/*
-fieldset {
-	border: none;
-	background: #eee;
-	margin-top: .5em;
-	display: flex;
-	flex-flow: column;
-}
-
-legend {
-	background: #eee;
-	padding: 1px;
-}
-
-fieldset .buttons {
-	display: flex;
-	padding-top: .5em;
-}
-
-fieldset .buttons > button {
-	flex: 1 auto;
-}
-
-fieldset > ul {
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-
-fieldset.size > ul {
-	-webkit-columns: 2;
-	-moz-columns: 2;
-	columns: 2;
-}
-*/
-
 </style>
 </head>
 <body>
@@ -213,7 +198,7 @@ fieldset.size > ul {
 <div class="wrap">
 	<div class="tag">
 		<label for="tag" class="input-label">Tag</label>
-		<input id="tag" class="major-input" type="text" />
+		<input id="tag" class="major-input" type="text" autofocus />
 	</div>
 
 	<div class="master">
@@ -234,24 +219,31 @@ fieldset.size > ul {
 		<div id="advanced-reveal" class="advanced-reveal hidden">
 			<div class="ad-line">
 				<label for="length">Length</label>
-				<input id="length" class="length-input" type="number" value="32" />
+				<input id="length" class="length-input" type="number" value="27" max="27" min="4" />
 			</div>
 			<div class="ad-line">
-				<label for="punctuation">Punctuation</label>
+				<label for="punctuation">Allow Punctuation</label>
 				<input class="input-checkbox" id="punctuation" type="checkbox" checked value="punctuation" />
 			</div>
 			<div class="ad-line">
-				<label for="upper">Upper case</label>
-				<input class="input-checkbox" id="upper" type="checkbox" checked value="upper" />
+				<label for="force-punctuation">Force Punctuation</label>
+				<input class="input-checkbox" id="force-punctuation" type="checkbox" checked value="force-punctuation" />
 			</div>
 			<div class="ad-line">
-				<label for="lower">Lower case</label>
-				<input class="input-checkbox" id="lower" type="checkbox" checked value="upper" />
-			</div>
-			<div class="ad-line">
-				<label for="numbers">Numbers</label>
+				<label for="numbers">Force Numbers</label>
 				<input class="input-checkbox" id="numbers" type="checkbox" checked value="digits" />
 			</div>
+			<div class="ad-line">
+				<label for="mixed">Force Mixed Case</label>
+				<input class="input-checkbox" id="mixed" type="checkbox" checked value="mixed" />
+			</div>
+			<div class="ad-line">
+				<label for="tag-id">Tag ID</label>
+				<input class="tag-id-input" id="tag-id" />
+			</div>
+			<p class="info"><a href="http://rland.me.uk">rland.me.uk</a> |
+				<a href="https://github.com/djmarland/password">Github</a> |
+				<a href="https://github.com/tabatkins/password">Forked from tabatkins</a></p>
 		</div>
 	</div>
 
@@ -259,66 +251,119 @@ fieldset.size > ul {
 
 <script>
 	(function() {
-		var ad = document.getElementById('advanced-button'),
-
+		var buttonAdvanced 	= document.getElementById('advanced-button'),
+			buttonCopy 		= document.getElementById('result-copy'),
+			inputTag 		= document.getElementById('tag'),
+			inputMaster 	= document.getElementById('password'),
+			inputResult 	= document.getElementById('result'),
+			inputLength 	= document.getElementById('length'),
+			inputPunctuation= document.getElementById('punctuation'),
+			inputPuncForce  = document.getElementById('force-punctuation'),
+		    inputMixed 		= document.getElementById('mixed'),
+			inputNumbers 	= document.getElementById('numbers'),
+			inputTagID 		= document.getElementById('tag-id'),
+			inputs			= [
+				inputTag,
+				inputMaster,
+				inputResult,
+				inputLength,
+				inputPunctuation,
+				inputPuncForce,
+				inputMixed,
+				inputNumbers
+			],
+			sectionReveal   = document.getElementById('advanced-reveal'),
+			totalInputs		= inputs.length,
+			classOk			= 'ok',
+			classError		= 'error',
+			valueTag		= null,
+			valueMaster		= null,
 			/* Known websites that have silly password restrictions */
 			presets = {
-				"tesco.com": {
+				"-1654128735": {
 					length: 12,
 					punctuation: true,
-					upper: true,
-					lower: true,
+					puncForce: true,
+					mixed: true,
 					numbers: true
 				},
-				"paypal.com": {
+				"-138012666": {
 					length: 20,
 					punctuation: true,
-					upper: true,
-					lower: true,
+					puncForce: true,
+					mixed: true,
 					numbers: true
 				}
 			};
 
-		alert('oi');
-
-
-
-		ad.addEventListener('click', function () {
-			document.getElementById('advanced-reveal').classList.toggle('hidden');
-			ad.classList.toggle('open')
-		});
-
-		var copyTextareaBtn = document.getElementById('result-copy');
-
-		var clearCopy = function () {
-			copyTextareaBtn.classList.remove('ok');
-			copyTextareaBtn.classList.remove('error');
-		};
-
-		copyTextareaBtn.addEventListener('click', function (event) {
-			var copyTextarea = document.getElementById('result');
-			copyTextarea.select();
-
-			try {
-				var successful = document.execCommand('copy');
-				var className = successful ? 'ok' : 'error';
-				copyTextareaBtn.classList.add(className);
-			} catch (err) {
-				copyTextareaBtn.classList.add('error');
-			}
-		});
-
-		var changed = function () {
-			clearCopy();
-			document.getElementById('result').value = new Date();
-		};
-
-		var inputs = document.getElementsByTagName('input'),
-				length = inputs.length;
-		for (var i = 0; i < length; i++) {
-			inputs[i].addEventListener('keyup', changed);
-			inputs[i].addEventListener('click', changed);
+		function clearCopy() {
+			buttonCopy.classList.remove(classOk);
+			buttonCopy.classList.remove(classError);
 		}
+
+		function tagId(tag) {
+			var id = tag.split("").reduce(function(a,b){a=((a<<5)-a)+b.charCodeAt(0);return a&a},0);
+			return id.toString();
+		}
+
+		function changed(ev) {
+			if (ev.target === inputPunctuation && !inputPunctuation.checked) {
+				inputPuncForce.checked = false;
+			}
+			if (ev.target === inputPuncForce && inputPuncForce.checked) {
+				inputPunctuation.checked = true;
+			}
+			valueMaster = inputMaster.value;
+			valueTag = tagId(inputTag.value.toLowerCase());
+			inputTagID.value = valueTag;
+			clearCopy();
+
+			if (presets[valueTag]) {
+				inputLength.value = presets[valueTag].length;
+				inputPunctuation.checked = presets[valueTag].punctuation;
+				inputPuncForce.checked = presets[valueTag].puncForce;
+				inputMixed.checked = presets[valueTag].mixed;
+				inputNumbers.checked = presets[valueTag].numbers;
+			}
+
+			inputResult.value = PassHashCommon.generateHashWord(
+					valueTag,
+					valueMaster,
+					inputLength.value,
+					inputNumbers.checked,
+					inputPuncForce.checked,
+					inputMixed.checked,
+					!inputPunctuation.checked,
+					false);
+		}
+
+		function addListeners()
+		{
+			buttonAdvanced.addEventListener('click', function () {
+				sectionReveal.classList.toggle('hidden');
+				buttonAdvanced.classList.toggle('open')
+			});
+
+			buttonCopy.addEventListener('click', function () {
+				inputResult.select();
+				try {
+					buttonCopy.classList.add(
+						document.execCommand('copy') ? classOk : classError
+					);
+				} catch (err) {
+					buttonCopy.classList.add(classError);
+				}
+			});
+
+			for (var i = 0; i < totalInputs; i++) {
+				inputs[i].addEventListener('keyup', changed);
+				inputs[i].addEventListener('click', changed);
+			}
+		}
+
+
+		addListeners();
+
 	})();
 </script>
 
@@ -437,7 +482,7 @@ window.onload = function() {
 		el.onclick = update;
 	});
 };
-</script>
+</script>-->
 
 <script>
 /*
@@ -840,6 +885,14 @@ var PassHashCommon =
 		},
 
 }
-</script>-->
+</script>
+<script>
+	(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+			function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+		e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+		e.src='//www.google-analytics.com/analytics.js';
+		r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+	ga('create','UA-24417125-1');ga('send','pageview');
+</script>
 </body>
 </html>
