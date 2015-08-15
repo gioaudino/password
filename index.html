@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-<title>Password Hasher</title>
+<title>Password Generator</title>
 <meta charset='utf-8'>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link href='http://fonts.googleapis.com/css?family=Roboto:100' rel='stylesheet' type='text/css' />
@@ -14,6 +14,7 @@
 html{
 	height: 100%;
 	background: linear-gradient(to bottom, rgba(0,0,0,0.33) 0%,rgba(0,0,0,0) 100%); /* W3C */
+	background-attachment: fixed;
 }
 body {
 	min-height: 100%;
@@ -74,8 +75,15 @@ body {
 	border-bottom-right-radius: 4px;
 	text-transform: uppercase;
 	outline: none;
-
 }
+.result-copy.ok {
+	background: #9c9;
+}
+.result-copy.error {
+	background: #c99;
+}
+
+
 .advanced-button {
 	padding: 8px 16px;
 	background: #999;
@@ -95,6 +103,10 @@ body {
 	position: relative;
 	top: -3px;
 }
+.advanced-button.open:after {
+	border-bottom: solid 4px #fff;
+	border-top: none;
+}
 
 .advanced-button:active,
 .result-copy:active {
@@ -104,7 +116,44 @@ body {
 .result-field {
 	display: flex;
 }
-
+.hidden {
+	display: none!important;
+}
+.advanced-reveal {
+	font-size: 1.4rem;
+}
+.ad-line {
+	display: flex;
+	margin-top: 16px;
+	padding-top: 16px;
+	border-top: solid 1px #ccc;
+}
+.ad-line:last-child {
+	padding-bottom: 16px;
+	border-bottom: solid 1px #ccc;
+}
+.ad-line label {
+	flex-grow: 1;
+}
+.length-input {
+	font-size: 1.4rem;
+	padding: 4px 8px;
+	width: 70px;
+	border: solid 1px #ccc;
+	border-top-color: #777;
+	border-left-color: #777;
+	border-radius: 4px;
+	font-family: monospace;
+	outline: none;
+	transition: box-shadow 0.3s, border 0.3s;
+}
+.length-input:focus {
+	box-shadow: 0 0 5px 1px #969696;
+}
+.input-checkbox {
+	width: 22px;
+	height: 22px;
+}
 @media (min-width: 768px) {
 	.input-label {
 		font-size: 2.8rem;
@@ -119,6 +168,7 @@ body {
 		display: none;
 	}
 }
+
 
 /*
 fieldset {
@@ -155,37 +205,122 @@ fieldset.size > ul {
 	columns: 2;
 }
 */
+
 </style>
 </head>
 <body>
 
 <div class="wrap">
 	<div class="tag">
-		<label class="input-label">Tag</label>
-		<input class="major-input" type="text" />
+		<label for="tag" class="input-label">Tag</label>
+		<input id="tag" class="major-input" type="text" />
 	</div>
 
 	<div class="master">
-		<label class="input-label">Master password</label>
-		<input class="major-input" type="password" />
+		<label for="password" class="input-label">Master password</label>
+		<input id="password" class="major-input" type="password" />
 	</div>
 
 	<div class="result">
-		<label class="result-label input-label">Result</label>
+		<label for="result" class="result-label input-label">Result</label>
 		<div class="result-field">
-			<input class="result-input major-input" type="text" />
-			<button class="result-copy">Copy</button>
+			<input id="result" class="result-input major-input" type="text" />
+			<button id="result-copy" class="result-copy">Copy</button>
 		</div>
 	</div>
 
 	<div class="advanced">
-		<button class="advanced-button">Advanced</button>
-		<div class="advanced-reveal">
-
+		<button class="advanced-button" id="advanced-button">Advanced</button>
+		<div id="advanced-reveal" class="advanced-reveal hidden">
+			<div class="ad-line">
+				<label for="length">Length</label>
+				<input id="length" class="length-input" type="number" value="32" />
+			</div>
+			<div class="ad-line">
+				<label for="punctuation">Punctuation</label>
+				<input class="input-checkbox" id="punctuation" type="checkbox" checked value="punctuation" />
+			</div>
+			<div class="ad-line">
+				<label for="upper">Upper case</label>
+				<input class="input-checkbox" id="upper" type="checkbox" checked value="upper" />
+			</div>
+			<div class="ad-line">
+				<label for="lower">Lower case</label>
+				<input class="input-checkbox" id="lower" type="checkbox" checked value="upper" />
+			</div>
+			<div class="ad-line">
+				<label for="numbers">Numbers</label>
+				<input class="input-checkbox" id="numbers" type="checkbox" checked value="digits" />
+			</div>
 		</div>
 	</div>
 
 </div>
+
+<script>
+	(function() {
+		var ad = document.getElementById('advanced-button'),
+
+			/* Known websites that have silly password restrictions */
+			presets = {
+				"tesco.com": {
+					length: 12,
+					punctuation: true,
+					upper: true,
+					lower: true,
+					numbers: true
+				},
+				"paypal.com": {
+					length: 20,
+					punctuation: true,
+					upper: true,
+					lower: true,
+					numbers: true
+				}
+			};
+
+		alert('oi');
+
+
+
+		ad.addEventListener('click', function () {
+			document.getElementById('advanced-reveal').classList.toggle('hidden');
+			ad.classList.toggle('open')
+		});
+
+		var copyTextareaBtn = document.getElementById('result-copy');
+
+		var clearCopy = function () {
+			copyTextareaBtn.classList.remove('ok');
+			copyTextareaBtn.classList.remove('error');
+		};
+
+		copyTextareaBtn.addEventListener('click', function (event) {
+			var copyTextarea = document.getElementById('result');
+			copyTextarea.select();
+
+			try {
+				var successful = document.execCommand('copy');
+				var className = successful ? 'ok' : 'error';
+				copyTextareaBtn.classList.add(className);
+			} catch (err) {
+				copyTextareaBtn.classList.add('error');
+			}
+		});
+
+		var changed = function () {
+			clearCopy();
+			document.getElementById('result').value = new Date();
+		};
+
+		var inputs = document.getElementsByTagName('input'),
+				length = inputs.length;
+		for (var i = 0; i < length; i++) {
+			inputs[i].addEventListener('keyup', changed);
+			inputs[i].addEventListener('click', changed);
+		}
+	})();
+</script>
 
 <!--
 <form>
@@ -244,6 +379,7 @@ fieldset.size > ul {
 	</details>
 </form>
 -->
+<!--
 <script>
 function findAll(sel) { return [].slice.call(document.querySelectorAll(sel)); }
 function find(sel) { return document.querySelector(sel); }
@@ -704,6 +840,6 @@ var PassHashCommon =
 		},
 
 }
-</script>
+</script>-->
 </body>
 </html>
