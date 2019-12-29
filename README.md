@@ -1,6 +1,6 @@
 Password Vault
 ===============
 
-Originally based on https://github.com/tabatkins/password
+Originally based on <https://github.com/djmarland/password>
 
-Available at https://rland.me.uk/password
+Available at <https://password.gioaudino.com>
