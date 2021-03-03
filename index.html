@@ -303,20 +303,20 @@ a:hover, a:active, a:focus {
 					mixed: true,
 					numbers: true
 				},
-		                "-138012666": {
-		                    length: 20,
-		                    punctuation: true,
-		                    puncForce: true,
-		                    mixed: true,
-		                    numbers: true
-		                },
-		                "-982090750": {
-		                    length: 16,
-		                    punctuation: true,
-		                    puncForce: true,
-		                    mixed: true,
-		                    numbers: true
-		                },
+                "-138012666": {
+                    length: 20,
+                    punctuation: true,
+                    puncForce: true,
+                    mixed: true,
+                    numbers: true
+                },
+                "-982090750": {
+                    length: 16,
+                    punctuation: true,
+                    puncForce: true,
+                    mixed: true,
+                    numbers: true
+                },
 				"-94228242": {
 					length: 16,
 					punctuation: true,
@@ -358,7 +358,14 @@ a:hover, a:active, a:focus {
 					puncForce: false,
 					mixed: true,
 					numbers: true
-				}
+				},
+				"-2095271699": {
+					length: 18,
+					punctuation: true,
+					puncForce: true,
+					mixed: true,
+					numbers: true
+				},
 			};
 
 		function clearCopy() {
@@ -382,7 +389,6 @@ a:hover, a:active, a:focus {
 			valueTag = tagId(inputTag.value.toLowerCase().trim());
 			inputTagID.value = valueTag;
 			clearCopy();
-
 			if (presets[valueTag]) {
 				inputLength.value = presets[valueTag].length;
 				inputPunctuation.checked = presets[valueTag].punctuation;
